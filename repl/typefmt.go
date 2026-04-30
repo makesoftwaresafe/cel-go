@@ -102,7 +102,7 @@ func checkWellKnown(name string) *env.TypeDesc {
 	case "google.protobuf.Uint64Value", ".google.protobuf.Uint64Value", "google.protobuf.Uint32Value", ".google.protobuf.Uint32Value":
 		return env.NewTypeDesc("uint_wrapper")
 	case "google.protobuf.DoubleValue", ".google.protobuf.DoubleValue", "google.protobuf.FloatValue", ".google.protobuf.FloatValue":
-		return env.NewTypeDesc("uint_wrapper")
+		return env.NewTypeDesc("double_wrapper")
 	case "google.protobuf.StringValue", ".google.protobuf.StringValue":
 		return env.NewTypeDesc("string_wrapper")
 	case "google.protobuf.BytesValue", ".google.protobuf.BytesValue":
