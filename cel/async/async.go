@@ -19,6 +19,7 @@ package async
 import (
 	"time"
 
+	"github.com/google/cel-go/common/functions"
 	"github.com/google/cel-go/interpreter"
 )
 
@@ -32,6 +33,9 @@ type Call = interpreter.AsyncCall
 // goroutines, and finish callbacks for distinct calls may run concurrently. See
 // interpreter.AsyncObserver for details.
 type Observer = interpreter.AsyncObserver
+
+// BlockingOp is a blocking asynchronous function operation.
+type BlockingOp = functions.BlockingAsyncOp
 
 // DrainAction dictates what ConcurrentEval should do after inspecting completions.
 type DrainAction struct {
@@ -52,8 +56,8 @@ type DrainStrategy interface {
 	// determines the next step.
 	//
 	// - completed: The set of completions accumulated in the current batch.
-	// - pending: The number of async calls currently launched but unresolved.
-	NextAction(completed []Call, pending int) DrainAction
+	// - active: The number of async calls currently launched but unresolved.
+	NextAction(completed []Call, active int) DrainAction
 }
 
 // DrainNone returns a strategy that re-evaluates after every single completion.
@@ -64,8 +68,8 @@ func DrainNone() DrainStrategy {
 
 type drainNone struct{}
 
-func (drainNone) NextAction(completed []Call, pending int) DrainAction {
-	return DrainAction{Reevaluate: pending == 0 || len(completed) > 0}
+func (drainNone) NextAction(completed []Call, active int) DrainAction {
+	return DrainAction{Reevaluate: active == 0 || len(completed) > 0}
 }
 
 // DrainReady returns a strategy that waits for a short duration after the first
@@ -78,8 +82,8 @@ type drainReady struct {
 	debounce time.Duration
 }
 
-func (d drainReady) NextAction(completed []Call, pending int) DrainAction {
-	if pending == 0 {
+func (d drainReady) NextAction(completed []Call, active int) DrainAction {
+	if active == 0 {
 		return DrainAction{Reevaluate: true} // Nothing left to wait for
 	}
 	if len(completed) == 0 {
@@ -99,6 +103,6 @@ func DrainAll() DrainStrategy {
 
 type drainAll struct{}
 
-func (drainAll) NextAction(completed []Call, pending int) DrainAction {
-	return DrainAction{Reevaluate: pending == 0}
+func (drainAll) NextAction(completed []Call, active int) DrainAction {
+	return DrainAction{Reevaluate: active == 0}
 }
