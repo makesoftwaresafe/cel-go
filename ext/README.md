@@ -84,6 +84,8 @@ intended; however, there is some chance for collision.
 
 ### Math.Greatest
 
+**Introduced in version 0 (cost support in version 3)**
+
 Returns the greatest valued number present in the arguments to the macro.
 
 Greatest is a variable argument count macro which must take at least one
@@ -110,6 +112,8 @@ Examples:
     math.greatest(dyn('string')) // runtime error
 
 ### Math.Least
+
+**Introduced in version 0 (cost support in version 3)**
 
 Returns the least valued number present in the arguments to the macro.
 
